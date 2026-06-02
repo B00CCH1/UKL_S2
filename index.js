@@ -4,12 +4,10 @@ import financeRoutes from "./router/finance.route.js";
 import loginRoutes from "./router/login.route.js";
 import productRoutes from "./router/product.route.js";
 import transactionRoutes from "./router/transaction.route.js";
-const cors = require("cors");
 
 const app = express();
 const port = process.env.PORT ?? 3000;
 
-app.use(cors());
 app.use(express.json());
 app.use("/uploads", express.static("uploads"));
 
