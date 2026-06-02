@@ -1,0 +1,225 @@
+================================================================================
+              TUTORIAL: SYNC MYSQL RAILWAY DENGAN PRISMA SCHEMA
+================================================================================
+
+PERMASALAHAN:
+- MySQL Railway schema tidak sesuai dengan Prisma schema
+- Kolom 'image' tidak ada di database
+
+SOLUSI:
+Jalankan 3 langkah penting berikut:
+
+================================================================================
+LANGKAH 1: VERIFIKASI PRISMA SCHEMA LOKAL
+================================================================================
+
+1. Buka file: d:\UKL\prisma\schema.prisma
+
+2. Pastikan model Product sudah ada kolom 'image':
+
+   model Product {
+     id          Int     @id @default(autoincrement())
+     name        String
+     description String
+     price       Float
+     stock       Int
+     image       String?          ← HARUS ADA INI
+
+     transactions Transaction[]
+     createdAt DateTime @default(now())
+   }
+
+3. Kalau sudah ada, lanjut ke LANGKAH 2
+
+================================================================================
+LANGKAH 2: GENERATE MIGRATION (LOKAL)
+================================================================================
+
+1. Buka Command Prompt/Terminal
+2. Navigate ke folder project:
+
+   cd d:\UKL
+
+3. Generate migration:
+
+   npx prisma migrate dev --name add_image_column
+
+4. Prisma akan tanya nama database/folder untuk test - ketik: Y
+
+5. Tunggu sampai selesai
+   Output akan seperti:
+   ✓ Created migration: 20260603_add_image_column
+   ✓ Database synced successfully
+
+6. Kalau berhasil, folder migrations sudah tercreate di: d:\UKL\prisma\migrations\
+
+================================================================================
+LANGKAH 3: PUSH KE GITHUB
+================================================================================
+
+1. Buka Terminal di folder project:
+
+   cd d:\UKL
+
+2. Add semua file:
+
+   git add .
+
+3. Commit:
+
+   git commit -m "Add image column to product - sync with Prisma schema"
+
+4. Push ke GitHub:
+
+   git push origin main
+
+5. Tunggu sampai berhasil
+
+================================================================================
+LANGKAH 4: REDEPLOY DI RAILWAY (OTOMATIS JALANKAN MIGRATION)
+================================================================================
+
+1. Buka: https://railway.app
+
+2. Login dengan GitHub
+
+3. Pilih Project: UKL atau meticulous-freedom
+
+4. Pilih Service: api (backend Node.js)
+
+5. Klik Tab: "Deployments"
+
+6. Cari deployment terbaru (paling atas)
+
+7. Klik "..." (3 dots) di sebelah kanan
+
+8. Pilih: "Redeploy"
+
+9. Status akan berubah:
+   - KUNING = Sedang deploy
+   - HIJAU = Sukses ✓
+
+10. Tunggu sampai HIJAU (biasanya 2-5 menit)
+
+11. Klik "View Logs" untuk lihat progress
+
+12. Cari pesan:
+    ✓ "Prisma migration successful"
+    atau
+    ✓ "Database migrated successfully"
+
+================================================================================
+LANGKAH 5: VERIFIKASI DATABASE RAILWAY SUDAH SYNC
+================================================================================
+
+1. Masih di Railway dashboard
+
+2. Pilih Service: MySQL (database)
+
+3. Klik Tab: "Data" atau "Query"
+
+4. Lihat tabel "Product"
+
+5. Klik tabel "Product"
+
+6. Cek kolom yang ada:
+   ✓ id
+   ✓ name
+   ✓ description
+   ✓ price
+   ✓ stock
+   ✓ image          ← HARUS ADA INI!
+   ✓ createdAt
+
+7. Kalau sudah ada kolom 'image', SUKSES! ✅
+
+================================================================================
+LANGKAH 6: TEST DI POSTMAN
+================================================================================
+
+1. Buka Postman
+
+2. Buat request baru:
+   - Method: POST
+   - URL: https://ukl2-production.up.railway.app/api/products
+
+3. Tab "Body" → Pilih "form-data"
+
+4. Isi fields:
+   KEY          VALUE                    TYPE
+   ─────────────────────────────────────────
+   name         Laptop Gaming            Text
+   description  Gaming laptop RTX 4060   Text
+   price        1500                     Text
+   stock        10                       Text
+   image        (pilih file .jpg/.png)   File
+
+5. Klik "Send"
+
+6. Kalau berhasil (201):
+   {
+     "id": 1,
+     "name": "Laptop Gaming",
+     "description": "Gaming laptop RTX 4060",
+     "price": 1500,
+     "stock": 10,
+     "image": "/uploads/laptop-1717452000000.jpg"  ← ADA GAMBAR!
+   }
+
+================================================================================
+TROUBLESHOOTING
+================================================================================
+
+❌ MASALAH: Masih error 500 setelah redeploy
+
+SOLUSI:
+1. Tunggu 5 menit (migration membutuhkan waktu)
+2. Refresh halaman Railway
+3. Cek Logs di Railway untuk error detail
+4. Kalau masih error, jalankan manual:
+
+   railway login
+   railway link
+   railway run npx prisma migrate deploy
+   railway run npx prisma db push
+
+---
+
+❌ MASALAH: Kolom image masih tidak ada di database Railway
+
+SOLUSI:
+1. Pastikan sudah push ke GitHub dengan migration files
+2. Pastikan Prisma schema benar (ada kolom image)
+3. Manual push schema:
+
+   railway run npx prisma db push --force-reset
+
+   ⚠️ PERINGATAN: Ini akan reset database! Hanya untuk development!
+
+---
+
+❌ MASALAH: Connection error ke database
+
+SOLUSI:
+1. Railway database service mungkin down
+2. Restart service:
+   - Railway dashboard → MySQL service → "..." → "Restart"
+3. Atau check apakah DATABASE_URL sudah ter-set:
+
+   railway env
+
+================================================================================
+RINGKASAN SINGKAT
+================================================================================
+
+✓ Step 1: Verifikasi Prisma schema lokal sudah ada kolom 'image'
+✓ Step 2: Generate migration lokal (npx prisma migrate dev)
+✓ Step 3: Push ke GitHub (git push)
+✓ Step 4: Redeploy di Railway (otomatis jalankan migration)
+✓ Step 5: Verifikasi kolom 'image' ada di database Railway
+✓ Step 6: Test upload gambar di Postman
+
+KALAU SEMUA LANGKAH SUDAH DILAKUKAN DENGAN BENAR:
+= Database Railway akan 100% sesuai dengan Prisma schema ✅
+
+================================================================================
