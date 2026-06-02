@@ -2,15 +2,14 @@
   "name": "ukl",
   "version": "1.0.0",
   "description": "",
-  "main": "Index.js",
+  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "nest build",
-    "start.prod": "node dist/main",
-    "start.dev": "nest start --watch",
-    "prisma.deploy": "prisma migrate deploy",
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "prisma:generate": "prisma generate",
+    "prisma:deploy": "prisma migrate deploy",
     "postinstall": "prisma generate",
-    "start": "node app.js"
+    "test": "node --test tests/*.test.js"
   },
   "keywords": [],
   "author": "",
@@ -22,5 +21,6 @@
     "express": "^5.2.1",
     "nodemon": "^3.1.14",
     "prisma": "^7.8.0"
-  }
+  },
+  "type": "module"
 }
