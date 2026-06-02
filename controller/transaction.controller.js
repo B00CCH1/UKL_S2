@@ -18,7 +18,9 @@ export const createTransaction = async (req, res) => {
       });
 
       if (!product) {
-        throw Object.assign(new Error("Product not found"), { statusCode: 404 });
+        throw Object.assign(new Error("Product not found"), {
+          statusCode: 404,
+        });
       }
 
       if (product.stock < quantity) {

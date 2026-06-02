@@ -7,9 +7,11 @@
 ## 🔐 AUTH (Authentication)
 
 ### 1️⃣ Register Client
+
 **Endpoint:** `POST /api/auth/register`
 
 **Request:**
+
 ```json
 {
   "name": "John Doe",
@@ -19,6 +21,7 @@
 ```
 
 **Response (201):**
+
 ```json
 {
   "id": 1,
@@ -33,9 +36,11 @@
 ---
 
 ### 2️⃣ Register Admin
+
 **Endpoint:** `POST /api/auth/register-admin`
 
 **Request:**
+
 ```json
 {
   "name": "Admin User",
@@ -46,6 +51,7 @@
 ```
 
 **Response (201):**
+
 ```json
 {
   "id": 2,
@@ -60,9 +66,11 @@
 ---
 
 ### 3️⃣ Login
+
 **Endpoint:** `POST /api/auth/login`
 
 **Request:**
+
 ```json
 {
   "email": "john@example.com",
@@ -71,6 +79,7 @@
 ```
 
 **Response (200):**
+
 ```json
 {
   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
@@ -90,9 +99,11 @@
 ## 📦 PRODUCTS
 
 ### 4️⃣ Get All Products (dengan filter & pagination)
+
 **Endpoint:** `GET /api/products`
 
 **Query Parameters:**
+
 - `search` (optional): Cari berdasarkan nama
 - `minPrice` (optional): Harga minimum
 - `maxPrice` (optional): Harga maksimum
@@ -104,11 +115,13 @@
 - `page` (optional): Halaman (default: 1)
 
 **Example Request:**
+
 ```
 GET http://localhost:3000/api/products?search=laptop&minPrice=100&maxPrice=5000&page=1&limit=10
 ```
 
 **Response (200):**
+
 ```json
 {
   "data": [
@@ -135,9 +148,11 @@ GET http://localhost:3000/api/products?search=laptop&minPrice=100&maxPrice=5000&
 ---
 
 ### 5️⃣ Create Product
+
 **Endpoint:** `POST /api/products`
 
 **Request (multipart/form-data):**
+
 - `name` (required): Nama produk
 - `description` (required): Deskripsi
 - `price` (required): Harga
@@ -145,6 +160,7 @@ GET http://localhost:3000/api/products?search=laptop&minPrice=100&maxPrice=5000&
 - `file` (optional): Gambar produk
 
 **JSON Request Alternative:**
+
 ```json
 {
   "name": "Mouse Wireless",
@@ -155,6 +171,7 @@ GET http://localhost:3000/api/products?search=laptop&minPrice=100&maxPrice=5000&
 ```
 
 **Response (201):**
+
 ```json
 {
   "id": 2,
@@ -171,9 +188,11 @@ GET http://localhost:3000/api/products?search=laptop&minPrice=100&maxPrice=5000&
 ---
 
 ### 6️⃣ Update Product
+
 **Endpoint:** `PUT /api/products/:id`
 
 **Request:**
+
 ```json
 {
   "name": "Mouse Wireless Pro",
@@ -184,6 +203,7 @@ GET http://localhost:3000/api/products?search=laptop&minPrice=100&maxPrice=5000&
 ```
 
 **Response (200):**
+
 ```json
 {
   "id": 2,
@@ -200,9 +220,11 @@ GET http://localhost:3000/api/products?search=laptop&minPrice=100&maxPrice=5000&
 ---
 
 ### 7️⃣ Delete Product
+
 **Endpoint:** `DELETE /api/products/:id`
 
 **Response (200):**
+
 ```json
 {
   "message": "Product deleted"
@@ -214,14 +236,17 @@ GET http://localhost:3000/api/products?search=laptop&minPrice=100&maxPrice=5000&
 ## 💳 TRANSACTIONS
 
 ### 8️⃣ Create Transaction
+
 **Endpoint:** `POST /api/transactions`
 
 **Headers:**
+
 ```
 Authorization: Bearer <token>
 ```
 
 **Request:**
+
 ```json
 {
   "productId": 1,
@@ -230,6 +255,7 @@ Authorization: Bearer <token>
 ```
 
 **Response (201):**
+
 ```json
 {
   "id": 1,
@@ -255,14 +281,17 @@ Authorization: Bearer <token>
 ---
 
 ### 9️⃣ Get My Transactions
+
 **Endpoint:** `GET /api/transactions/my`
 
 **Headers:**
+
 ```
 Authorization: Bearer <token>
 ```
 
 **Response (200):**
+
 ```json
 [
   {
@@ -291,9 +320,11 @@ Authorization: Bearer <token>
 ## 💰 FINANCE
 
 ### 🔟 Get Finance Report
+
 **Endpoint:** `GET /api/finance/report`
 
 **Response (200):**
+
 ```json
 {
   "totalIncome": 5000,
@@ -328,9 +359,11 @@ Authorization: Bearer <token>
 ## 👥 USERS/LOGIN
 
 ### 1️⃣1️⃣ Get All Users
+
 **Endpoint:** `GET /api/login`
 
 **Response (200):**
+
 ```json
 [
   {
@@ -355,9 +388,11 @@ Authorization: Bearer <token>
 ---
 
 ### 1️⃣2️⃣ Create User
+
 **Endpoint:** `POST /api/login`
 
 **Request:**
+
 ```json
 {
   "name": "Jane Doe",
@@ -368,6 +403,7 @@ Authorization: Bearer <token>
 ```
 
 **Response (201):**
+
 ```json
 {
   "id": 3,
@@ -382,9 +418,11 @@ Authorization: Bearer <token>
 ---
 
 ### 1️⃣3️⃣ Update User
+
 **Endpoint:** `PUT /api/login/:id`
 
 **Request:**
+
 ```json
 {
   "name": "Jane Smith",
@@ -395,6 +433,7 @@ Authorization: Bearer <token>
 ```
 
 **Response (200):**
+
 ```json
 {
   "id": 3,
@@ -409,9 +448,11 @@ Authorization: Bearer <token>
 ---
 
 ### 1️⃣4️⃣ Delete User
+
 **Endpoint:** `DELETE /api/login/:id`
 
 **Response (200):**
+
 ```json
 {
   "message": "User deleted"
@@ -478,6 +519,7 @@ Impor ke Postman: **File → Import → Paste raw text di bawah**
 ## ⚠️ Error Responses
 
 ### 400 Bad Request
+
 ```json
 {
   "message": "Name, email, and password are required"
@@ -485,6 +527,7 @@ Impor ke Postman: **File → Import → Paste raw text di bawah**
 ```
 
 ### 404 Not Found
+
 ```json
 {
   "message": "User not found"
@@ -492,6 +535,7 @@ Impor ke Postman: **File → Import → Paste raw text di bawah**
 ```
 
 ### 500 Internal Server Error
+
 ```json
 {
   "message": "Error message"
@@ -501,6 +545,7 @@ Impor ke Postman: **File → Import → Paste raw text di bawah**
 ---
 
 **Tips:**
+
 - Gunakan token dari login untuk endpoint yang membutuhkan authentication
 - Semua request header harus `Content-Type: application/json`
 - Replace `:id` dengan ID yang sebenarnya

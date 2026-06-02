@@ -23,6 +23,7 @@ app.use("/api/transactions", transactionRoutes);
 app.use("/api/finance", financeRoutes);
 app.use("/api/login", loginRoutes);
 
+const port = process.env.PORT || 3000; // ← WAJIB ada ini!
 if (process.env.NODE_ENV !== "test") {
   app.listen(port, "0.0.0.0", () => {
     console.log(`Server is running on port ${port}`);
