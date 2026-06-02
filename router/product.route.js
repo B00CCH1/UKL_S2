@@ -5,12 +5,13 @@ import {
   updateProduct,
   deleteProduct,
 } from "../controller/product.controller.js";
+import upload from "../middleware/multer.js";
 
 const router = Router();
 
 router.get("/", getProducts);
-router.post("/", createProduct);
-router.put("/:id", updateProduct);
+router.post("/", upload.single("image"), createProduct);
+router.put("/:id", upload.single("image"), updateProduct);
 router.delete("/:id", deleteProduct);
 
 export default router;
