@@ -1,63 +1,82 @@
-const prisma = require("../lib/prisma");
+import bcrypt from "bcryptjs";
+import prisma from "../lib/prisma.js";
 
-// GET ALL USERS
-const getUsers = async (req, res) => {
+export const getUsers = async (_req, res) => {
   try {
-    const users = await prisma.user.findMany();
+    const users = await prisma.user.findMany({
+      omit: {
+        password: true,
+      },
+      orderBy: { createdAt: "desc" },
+    });
 
-    res.json(users);
+    return res.json(users);
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       message: error.message,
     });
   }
 };
 
-// CREATE USER
-const createUser = async (req, res) => {
+export const createUser = async (req, res) => {
   try {
-    const { name, email } = req.body;
+    const { name, email, password, role } = req.body;
+
+    if (!name || !email || !password) {
+      return res.status(400).json({
+        message: "Name, email, and password are required",
+      });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = await prisma.user.create({
       data: {
         name,
         email,
+        password: hashedPassword,
+        ...(role ? { role } : {}),
+      },
+      omit: {
+        password: true,
       },
     });
 
-    res.status(201).json(user);
+    return res.status(201).json(user);
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       message: error.message,
     });
   }
 };
 
-// UPDATE USER
-const updateUser = async (req, res) => {
+export const updateUser = async (req, res) => {
   try {
     const id = Number(req.params.id);
-
-    const { name, email } = req.body;
+    const { name, email, password, role } = req.body;
 
     const user = await prisma.user.update({
       where: { id },
       data: {
-        name,
-        email,
+        ...(name !== undefined ? { name } : {}),
+        ...(email !== undefined ? { email } : {}),
+        ...(password !== undefined ? { password: await bcrypt.hash(password, 10) } : {}),
+        ...(role !== undefined ? { role } : {}),
+      },
+      omit: {
+        password: true,
       },
     });
 
-    res.json(user);
+    return res.json(user);
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       message: error.message,
     });
   }
 };
 
-// DELETE USER
-const deleteUser = async (req, res) => {
+export const deleteUser = async (req, res) => {
   try {
     const id = Number(req.params.id);
 
@@ -65,19 +84,12 @@ const deleteUser = async (req, res) => {
       where: { id },
     });
 
-    res.json({
+    return res.json({
       message: "User deleted",
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       message: error.message,
     });
   }
-};
-
-module.exports = {
-  getUsers,
-  createUser,
-  updateUser,
-  deleteUser,
 };

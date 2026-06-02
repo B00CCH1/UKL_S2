@@ -1,15 +1,19 @@
-const prisma = require("../lib/prisma");
-const bcrypt = require("bcryptjs");
-const { generateToken } = require("../utils/jwt");
+import bcrypt from "bcryptjs";
+import prisma from "../lib/prisma.js";
+import { generateToken } from "../utils/jwt.js";
 
-const register = async (req, res) => {
+export const register = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, role } = req.body;
+
+    if (!name || !email || !password) {
+      return res.status(400).json({
+        message: "Name, email, and password are required",
+      });
+    }
 
     const checkEmail = await prisma.user.findUnique({
-      where: {
-        email,
-      },
+      where: { email },
     });
 
     if (checkEmail) {
@@ -25,25 +29,33 @@ const register = async (req, res) => {
         name,
         email,
         password: hashedPassword,
+        ...(role ? { role } : {}),
+      },
+      omit: {
+        password: true,
       },
     });
 
-    res.json(user);
+    return res.status(201).json(user);
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       message: error.message,
     });
   }
 };
 
-const login = async (req, res) => {
+export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
+    if (!email || !password) {
+      return res.status(400).json({
+        message: "Email and password are required",
+      });
+    }
+
     const user = await prisma.user.findUnique({
-      where: {
-        email,
-      },
+      where: { email },
     });
 
     if (!user) {
@@ -61,13 +73,14 @@ const login = async (req, res) => {
     }
 
     const token = generateToken(user);
+    const { password: _password, ...safeUser } = user;
 
-    res.json({
+    return res.json({
       token,
-      user,
+      user: safeUser,
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       message: error.message,
     });
   }

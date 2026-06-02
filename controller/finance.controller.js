@@ -1,24 +1,28 @@
-const prisma = require("../lib/prisma");
+import prisma from "../lib/prisma.js";
 
-const getFinanceReport = async (req, res) => {
+export const getFinanceReport = async (_req, res) => {
   try {
-    const finances = await prisma.finance.findMany();
+    const finances = await prisma.finance.findMany({
+      include: {
+        transaction: true,
+        user: {
+          omit: {
+            password: true,
+          },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+    });
 
-    const totalIncome = finances.reduce((acc, item) => {
-      return acc + item.income;
-    }, 0);
+    const totalIncome = finances.reduce((acc, item) => acc + item.income, 0);
 
-    res.json({
+    return res.json({
       totalIncome,
       finances,
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       message: error.message,
     });
   }
-};
-
-module.exports = {
-  getFinanceReport,
 };

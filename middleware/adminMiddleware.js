@@ -1,11 +1,11 @@
 const adminMiddleware = (req, res, next) => {
-  if (req.user.role !== "ADMIN") {
+  if (req.user?.role !== "ADMIN") {
     return res.status(403).json({
       message: "Access denied",
     });
   }
 
-  next();
+  return next();
 };
 
-module.exports = adminMiddleware;
+export default adminMiddleware;

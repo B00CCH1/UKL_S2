@@ -1,75 +1,83 @@
-const prisma = require("../lib/prisma");
+import prisma from "../lib/prisma.js";
 
-const createProduct = async (req, res) => {
+export const getProducts = async (_req, res) => {
+  try {
+    const products = await prisma.product.findMany({
+      orderBy: { createdAt: "desc" },
+    });
+
+    return res.json(products);
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message,
+    });
+  }
+};
+
+export const createProduct = async (req, res) => {
   try {
     const { name, description, price, stock } = req.body;
+
+    if (!name || !description || price === undefined || stock === undefined) {
+      return res.status(400).json({
+        message: "Name, description, price, and stock are required",
+      });
+    }
 
     const product = await prisma.product.create({
       data: {
         name,
         description,
-        price,
-        stock,
+        price: Number(price),
+        stock: Number(stock),
       },
     });
 
-    res.json(product);
+    return res.status(201).json(product);
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       message: error.message,
     });
   }
 };
 
-const updateProduct = async (req, res) => {
+export const updateProduct = async (req, res) => {
   try {
     const id = Number(req.params.id);
-
     const { name, description, price, stock } = req.body;
 
     const product = await prisma.product.update({
-      where: {
-        id,
-      },
+      where: { id },
       data: {
-        name,
-        description,
-        price,
-        stock,
+        ...(name !== undefined ? { name } : {}),
+        ...(description !== undefined ? { description } : {}),
+        ...(price !== undefined ? { price: Number(price) } : {}),
+        ...(stock !== undefined ? { stock: Number(stock) } : {}),
       },
     });
 
-    res.json(product);
+    return res.json(product);
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       message: error.message,
     });
   }
 };
 
-const deleteProduct = async (req, res) => {
+export const deleteProduct = async (req, res) => {
   try {
     const id = Number(req.params.id);
 
     await prisma.product.delete({
-      where: {
-        id,
-      },
+      where: { id },
     });
 
-    res.json({
+    return res.json({
       message: "Product deleted",
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       message: error.message,
     });
   }
-};
-
-module.exports = {
-  getProducts,
-  createProduct,
-  updateProduct,
-  deleteProduct,
 };
