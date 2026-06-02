@@ -6,3 +6,4 @@ node_modules
 
 dist
 .DS_Storegi
+/lib/generated/prisma
