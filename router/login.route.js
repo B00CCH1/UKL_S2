@@ -1,9 +1,9 @@
 import { Router } from "express";
 import {
-  createUser,
-  deleteUser,
   getUsers,
+  createUser,
   updateUser,
+  deleteUser,
 } from "../controller/login.controller.js";
 
 const router = Router();

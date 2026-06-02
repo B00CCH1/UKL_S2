@@ -1,5 +1,4 @@
 import { Router } from "express";
-import authMiddleware from "../middleware/authMiddleware.js";
 import {
   createTransaction,
   getMyTransactions,
@@ -7,7 +6,7 @@ import {
 
 const router = Router();
 
-router.post("/", authMiddleware, createTransaction);
-router.get("/my-history", authMiddleware, getMyTransactions);
+router.post("/", createTransaction);
+router.get("/my", getMyTransactions);
 
 export default router;
