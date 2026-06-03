@@ -81,3 +81,159 @@ export const getMyTransactions = async (req, res) => {
     });
   }
 };
+
+export const getAllTransactions = async (req, res) => {
+  try {
+    const {
+      search,
+      minPrice,
+      maxPrice,
+      minQuantity,
+      maxQuantity,
+      userId,
+      sortBy = "createdAt",
+      sortOrder = "desc",
+      limit = "10",
+      page = "1",
+    } = req.query;
+
+    const where = {};
+
+    if (search) {
+      where.product = {
+        name: { contains: search, mode: "insensitive" },
+      };
+    }
+
+    if (minPrice !== undefined || maxPrice !== undefined) {
+      where.totalPrice = {};
+      if (minPrice !== undefined) where.totalPrice.gte = Number(minPrice);
+      if (maxPrice !== undefined) where.totalPrice.lte = Number(maxPrice);
+    }
+
+    if (minQuantity !== undefined || maxQuantity !== undefined) {
+      where.quantity = {};
+      if (minQuantity !== undefined) where.quantity.gte = Number(minQuantity);
+      if (maxQuantity !== undefined) where.quantity.lte = Number(maxQuantity);
+    }
+
+    if (userId !== undefined) {
+      where.userId = Number(userId);
+    }
+
+    const pageNum = Math.max(1, Number(page));
+    const limitNum = Math.min(100, Math.max(1, Number(limit)));
+    const skip = (pageNum - 1) * limitNum;
+
+    const [transactions, total] = await Promise.all([
+      prisma.transaction.findMany({
+        where,
+        include: {
+          product: true,
+          finance: true,
+          user: {
+            omit: {
+              password: true,
+            },
+          },
+        },
+        orderBy: { [sortBy]: sortOrder.toLowerCase() },
+        skip,
+        take: limitNum,
+      }),
+      prisma.transaction.count({ where }),
+    ]);
+
+    const totalPages = Math.ceil(total / limitNum);
+
+    return res.json({
+      data: transactions,
+      pagination: {
+        total,
+        page: pageNum,
+        limit: limitNum,
+        totalPages,
+      },
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message,
+    });
+  }
+};
+
+export const getTransactionById = async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+
+    const transaction = await prisma.transaction.findUnique({
+      where: { id },
+      include: {
+        product: true,
+        finance: true,
+        user: {
+          omit: {
+            password: true,
+          },
+        },
+      },
+    });
+
+    if (!transaction) {
+      return res.status(404).json({
+        message: "Transaction not found",
+      });
+    }
+
+    return res.json(transaction);
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message,
+    });
+  }
+};
+
+export const deleteTransaction = async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+
+    const transaction = await prisma.transaction.findUnique({
+      where: { id },
+    });
+
+    if (!transaction) {
+      return res.status(404).json({
+        message: "Transaction not found",
+      });
+    }
+
+    await prisma.$transaction(async (tx) => {
+      const product = await tx.product.findUnique({
+        where: { id: transaction.productId },
+      });
+
+      if (product) {
+        await tx.product.update({
+          where: { id: transaction.productId },
+          data: {
+            stock: {
+              increment: transaction.quantity,
+            },
+          },
+        });
+      }
+
+      await tx.transaction.delete({
+        where: { id },
+      });
+    });
+
+    return res.json({
+      message: "Transaction deleted and stock restored",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message,
+    });
+  }
+};
