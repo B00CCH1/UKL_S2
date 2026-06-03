@@ -6,7 +6,7 @@ import productRoutes from "./router/product.route.js";
 import transactionRoutes from "./router/transaction.route.js";
 
 const app = express();
-const port = process.env.PORT ?? 3000;
+const port = process.env.PORT || 3000; // ← WAJIB ada ini!
 
 app.use(express.json());
 app.use("/uploads", express.static("uploads"));
@@ -23,7 +23,6 @@ app.use("/api/transactions", transactionRoutes);
 app.use("/api/finance", financeRoutes);
 app.use("/api/login", loginRoutes);
 
-const port = process.env.PORT || 3000; // ← WAJIB ada ini!
 if (process.env.NODE_ENV !== "test") {
   app.listen(port, "0.0.0.0", () => {
     console.log(`Server is running on port ${port}`);
