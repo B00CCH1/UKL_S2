@@ -78,7 +78,9 @@ model Finance {
   userId Int
   user   User @relation(fields: [userId], references: [id])
 
-  income Float
+  income       Float
+  expense      Float   @default(0)
+  description  String?
 
   createdAt DateTime @default(now())
 }

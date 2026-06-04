@@ -1,6 +1,10 @@
 import bcrypt from "bcryptjs";
 import prisma from "../lib/prisma.js";
 
+const validateEmail = (email) => {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+};
+
 export const getUsers = async (_req, res) => {
   try {
     const users = await prisma.user.findMany({
@@ -24,7 +28,13 @@ export const createUser = async (req, res) => {
 
     if (!name || !email || !password) {
       return res.status(400).json({
-        message: "Name, email, and password are required",
+        message: "Pembuatan user gagal: Nama, email, dan password harus diisi",
+      });
+    }
+
+    if (!validateEmail(email)) {
+      return res.status(400).json({
+        message: "Pembuatan user gagal: Format email tidak valid (harus mengandung @)",
       });
     }
 
@@ -42,10 +52,13 @@ export const createUser = async (req, res) => {
       },
     });
 
-    return res.status(201).json(user);
+    return res.status(201).json({
+      message: "Pembuatan user berhasil",
+      user,
+    });
   } catch (error) {
     return res.status(500).json({
-      message: error.message,
+      message: `Pembuatan user gagal: ${error.message}`,
     });
   }
 };
@@ -54,6 +67,12 @@ export const updateUser = async (req, res) => {
   try {
     const id = Number(req.params.id);
     const { name, email, password, role } = req.body;
+
+    if (email && !validateEmail(email)) {
+      return res.status(400).json({
+        message: "Update user gagal: Format email tidak valid (harus mengandung @)",
+      });
+    }
 
     const user = await prisma.user.update({
       where: { id },
@@ -68,10 +87,13 @@ export const updateUser = async (req, res) => {
       },
     });
 
-    return res.json(user);
+    return res.json({
+      message: "Update user berhasil",
+      user,
+    });
   } catch (error) {
     return res.status(500).json({
-      message: error.message,
+      message: `Update user gagal: ${error.message}`,
     });
   }
 };
@@ -85,11 +107,11 @@ export const deleteUser = async (req, res) => {
     });
 
     return res.json({
-      message: "User deleted",
+      message: "User berhasil dihapus",
     });
   } catch (error) {
     return res.status(500).json({
-      message: error.message,
+      message: `Penghapusan user gagal: ${error.message}`,
     });
   }
 };

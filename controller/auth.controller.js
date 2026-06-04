@@ -2,13 +2,23 @@ import bcrypt from "bcryptjs";
 import prisma from "../lib/prisma.js";
 import { generateToken } from "../utils/jwt.js";
 
+const validateEmail = (email) => {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+};
+
 export const register = async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
 
     if (!name || !email || !password) {
       return res.status(400).json({
-        message: "Name, email, and password are required",
+        message: "Registrasi gagal: Nama, email, dan password harus diisi",
+      });
+    }
+
+    if (!validateEmail(email)) {
+      return res.status(400).json({
+        message: "Registrasi gagal: Format email tidak valid (harus mengandung @)",
       });
     }
 
@@ -18,7 +28,7 @@ export const register = async (req, res) => {
 
     if (checkEmail) {
       return res.status(400).json({
-        message: "Email already used",
+        message: "Registrasi gagal: Email sudah terdaftar",
       });
     }
 
@@ -36,10 +46,13 @@ export const register = async (req, res) => {
       },
     });
 
-    return res.status(201).json(user);
+    return res.status(201).json({
+      message: "Registrasi berhasil",
+      user,
+    });
   } catch (error) {
     return res.status(500).json({
-      message: error.message,
+      message: `Registrasi gagal: ${error.message}`,
     });
   }
 };
@@ -50,13 +63,19 @@ export const registerAdmin = async (req, res) => {
 
     if (!adminSecret || adminSecret !== process.env.ADMIN_SECRET) {
       return res.status(403).json({
-        message: "Invalid admin secret key",
+        message: "Registrasi admin gagal: Admin secret key tidak valid",
       });
     }
 
     if (!name || !email || !password) {
       return res.status(400).json({
-        message: "Name, email, and password are required",
+        message: "Registrasi admin gagal: Nama, email, dan password harus diisi",
+      });
+    }
+
+    if (!validateEmail(email)) {
+      return res.status(400).json({
+        message: "Registrasi admin gagal: Format email tidak valid (harus mengandung @)",
       });
     }
 
@@ -66,7 +85,7 @@ export const registerAdmin = async (req, res) => {
 
     if (checkEmail) {
       return res.status(400).json({
-        message: "Email already used",
+        message: "Registrasi admin gagal: Email sudah terdaftar",
       });
     }
 
@@ -77,17 +96,20 @@ export const registerAdmin = async (req, res) => {
         name,
         email,
         password: hashedPassword,
-        role: "admin",
+        role: "ADMIN",
       },
       omit: {
         password: true,
       },
     });
 
-    return res.status(201).json(user);
+    return res.status(201).json({
+      message: "Registrasi admin berhasil",
+      user,
+    });
   } catch (error) {
     return res.status(500).json({
-      message: error.message,
+      message: `Registrasi admin gagal: ${error.message}`,
     });
   }
 };
@@ -98,7 +120,13 @@ export const login = async (req, res) => {
 
     if (!email || !password) {
       return res.status(400).json({
-        message: "Email and password are required",
+        message: "Login gagal: Email dan password harus diisi",
+      });
+    }
+
+    if (!validateEmail(email)) {
+      return res.status(400).json({
+        message: "Login gagal: Format email tidak valid (harus mengandung @)",
       });
     }
 
@@ -108,7 +136,7 @@ export const login = async (req, res) => {
 
     if (!user) {
       return res.status(404).json({
-        message: "User not found",
+        message: "Login gagal: Email tidak ditemukan",
       });
     }
 
@@ -116,7 +144,7 @@ export const login = async (req, res) => {
 
     if (!isMatch) {
       return res.status(400).json({
-        message: "Wrong password",
+        message: "Login gagal: Password salah",
       });
     }
 
@@ -124,12 +152,13 @@ export const login = async (req, res) => {
     const { password: _password, ...safeUser } = user;
 
     return res.json({
+      message: "Login berhasil",
       token,
       user: safeUser,
     });
   } catch (error) {
     return res.status(500).json({
-      message: error.message,
+      message: `Login gagal: ${error.message}`,
     });
   }
 };
