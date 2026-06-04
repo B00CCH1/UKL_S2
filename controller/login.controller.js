@@ -22,6 +22,34 @@ export const getUsers = async (_req, res) => {
   }
 };
 
+export const getUserById = async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+
+    const user = await prisma.user.findUnique({
+      where: { id },
+      omit: {
+        password: true,
+      },
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User tidak ditemukan",
+      });
+    }
+
+    return res.json({
+      message: "User ditemukan",
+      data: user,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message,
+    });
+  }
+};
+
 export const createUser = async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
