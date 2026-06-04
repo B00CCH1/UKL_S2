@@ -64,6 +64,31 @@ export const getProducts = async (req, res) => {
   }
 };
 
+export const getProductById = async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+
+    const product = await prisma.product.findUnique({
+      where: { id },
+    });
+
+    if (!product) {
+      return res.status(404).json({
+        message: "Produk tidak ditemukan",
+      });
+    }
+
+    return res.json({
+      message: "Produk ditemukan",
+      data: product,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message,
+    });
+  }
+};
+
 export const createProduct = async (req, res) => {
   try {
     const { name, description, price, stock } = req.body;
