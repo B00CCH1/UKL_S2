@@ -61,7 +61,7 @@ export const registerAdmin = async (req, res) => {
   try {
     const { name, email, password, adminSecret } = req.body;
 
-    if (!adminSecret || adminSecret !== process.env.ADMIN_SECRET) {
+    if (!adminSecret || adminSecret.trim() !== (process.env.ADMIN_SECRET || "").trim()) {
       return res.status(403).json({
         message: "Registrasi admin gagal: Admin secret key tidak valid",
       });
