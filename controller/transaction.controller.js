@@ -8,7 +8,7 @@ export const createTransaction = async (req, res) => {
 
     if (!productId || !quantity || quantity <= 0) {
       return res.status(400).json({
-        message: "Valid productId and quantity are required",
+        message: "ProductId dan quantity harus diisi, quantity harus > 0",
       });
     }
 
@@ -18,13 +18,13 @@ export const createTransaction = async (req, res) => {
       });
 
       if (!product) {
-        throw Object.assign(new Error("Product not found"), {
+        throw Object.assign(new Error("Produk tidak ditemukan"), {
           statusCode: 404,
         });
       }
 
       if (product.stock < quantity) {
-        throw Object.assign(new Error("Stock not enough"), { statusCode: 400 });
+        throw Object.assign(new Error(`Stok tidak cukup. Tersedia: ${product.stock}`), { statusCode: 400 });
       }
 
       const totalPrice = product.price * quantity;
@@ -53,7 +53,18 @@ export const createTransaction = async (req, res) => {
       return createdTransaction;
     });
 
-    return res.status(201).json(transaction);
+    return res.status(201).json({
+      message: "Transaksi berhasil dibuat",
+      data: {
+        id: transaction.id,
+        productName: transaction.product.name,
+        productPrice: transaction.product.price,
+        quantity: transaction.quantity,
+        totalPrice: transaction.totalPrice,
+        status: transaction.status,
+        createdAt: transaction.createdAt,
+      },
+    });
   } catch (error) {
     return res.status(error.statusCode ?? 500).json({
       message: error.message,

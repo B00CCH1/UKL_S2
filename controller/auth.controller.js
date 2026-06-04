@@ -59,13 +59,7 @@ export const register = async (req, res) => {
 
 export const registerAdmin = async (req, res) => {
   try {
-    const { name, email, password, adminSecret } = req.body;
-
-    if (!adminSecret || adminSecret.trim() !== (process.env.ADMIN_SECRET || "").trim()) {
-      return res.status(403).json({
-        message: "Registrasi admin gagal: Admin secret key tidak valid",
-      });
-    }
+    const { name, email, password } = req.body;
 
     if (!name || !email || !password) {
       return res.status(400).json({
