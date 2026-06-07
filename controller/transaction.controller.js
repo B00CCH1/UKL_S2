@@ -24,7 +24,10 @@ export const createTransaction = async (req, res) => {
       }
 
       if (product.stock < quantity) {
-        throw Object.assign(new Error(`Stok tidak cukup. Tersedia: ${product.stock}`), { statusCode: 400 });
+        throw Object.assign(
+          new Error(`Stok tidak cukup. Tersedia: ${product.stock}`),
+          { statusCode: 400 },
+        );
       }
 
       const totalPrice = product.price * quantity;
@@ -61,7 +64,6 @@ export const createTransaction = async (req, res) => {
         productPrice: transaction.product.price,
         quantity: transaction.quantity,
         totalPrice: transaction.totalPrice,
-        status: transaction.status,
         createdAt: transaction.createdAt,
       },
     });

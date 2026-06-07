@@ -62,7 +62,8 @@ export const createUser = async (req, res) => {
 
     if (!validateEmail(email)) {
       return res.status(400).json({
-        message: "Pembuatan user gagal: Format email tidak valid (harus mengandung @)",
+        message:
+          "Pembuatan user gagal: Format email tidak valid (harus mengandung @)",
       });
     }
 
@@ -98,7 +99,8 @@ export const updateUser = async (req, res) => {
 
     if (email && !validateEmail(email)) {
       return res.status(400).json({
-        message: "Update user gagal: Format email tidak valid (harus mengandung @)",
+        message:
+          "Update user gagal: Format email tidak valid (harus mengandung @)",
       });
     }
 
@@ -107,7 +109,9 @@ export const updateUser = async (req, res) => {
       data: {
         ...(name !== undefined ? { name } : {}),
         ...(email !== undefined ? { email } : {}),
-        ...(password !== undefined ? { password: await bcrypt.hash(password, 10) } : {}),
+        ...(password !== undefined
+          ? { password: await bcrypt.hash(password, 10) }
+          : {}),
         ...(role !== undefined ? { role } : {}),
       },
       omit: {

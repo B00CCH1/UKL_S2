@@ -18,7 +18,8 @@ export const register = async (req, res) => {
 
     if (!validateEmail(email)) {
       return res.status(400).json({
-        message: "Registrasi gagal: Format email tidak valid (harus mengandung @)",
+        message:
+          "Registrasi gagal: Format email tidak valid (harus mengandung @)",
       });
     }
 
@@ -63,13 +64,15 @@ export const registerAdmin = async (req, res) => {
 
     if (!name || !email || !password) {
       return res.status(400).json({
-        message: "Registrasi admin gagal: Nama, email, dan password harus diisi",
+        message:
+          "Registrasi admin gagal: Nama, email, dan password harus diisi",
       });
     }
 
     if (!validateEmail(email)) {
       return res.status(400).json({
-        message: "Registrasi admin gagal: Format email tidak valid (harus mengandung @)",
+        message:
+          "Registrasi admin gagal: Format email tidak valid (harus mengandung @)",
       });
     }
 
